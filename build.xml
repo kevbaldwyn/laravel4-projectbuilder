@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Laravel Project" default="welcome" basedir="../" description="Laravel Project Build Targets">
+	
+	<target name="welcome">
+		<echo message="Hello, welcome to ${phing.project.name}!" />
+		
+		<echo message="There are 2 options 'install' and 'update'" />
+	</target>
+	
+	
+	<target name="update">
+	
+		<propertyprompt
+    		propertyName="env"
+    		promptText="What is your Laravel environment name?"
+		/>
+	
+		<if>
+			<isfalse value="${env}"/>
+			<then>
+				<fail message="Invalid environment name!" />
+			</then>
+		</if>
+		
+		<!-- git -->
+		<echo message="Pulling from repository..." />
+		
+		<echo message="Done." />
+		<!-- composer -->
+		<echo message="Checking packages..." />
+		<exec 
+			command="composer update" 
+			passthru="true" 
+		/>
+		<echo message="Done." />
+		
+		<!-- migrations -->
+		<echo message="Running migrations..." />
+		<exec 
+			command="php artisan migrate --env-${env}" 
+			passthru="true" 
+		/>
+		<echo message="Done." />
+
+	</target>	
+	
+	
+	<target name="install">
+		
+		<echo message="Before installing you must have created a database, and have the connection details ready. You must also have composer installed." />
+		
+		<propertyprompt
+    		propertyName="env.name"
+    		promptText="What is your Laravel environment name?"
+		/>
+		<propertyprompt
+    		propertyName="env.host"
+    		promptText="And the host name you want to use?"
+		/>
+		<echo message="Database settings..." />
+		<propertyprompt
+    		propertyName="db.host"
+    		promptText="Host:"
+		/>
+		<propertyprompt
+    		propertyName="db.name"
+    		promptText="Database name:"
+		/>
+		<propertyprompt
+    		propertyName="db.user"
+    		promptText="Username:"
+		/>
+		<propertyprompt
+    		propertyName="db.pass"
+    		promptText="Password:"
+		/>
+	
+		<if>
+			<isfalse value="${env.name}"/>
+			<then>
+				<fail message="Invalid environment name!" />
+			</then>
+		</if>
+	
+		<if>
+			<isfalse value="${env.host}"/>
+			<then>
+				<fail message="Invalid host name!" />
+			</then>
+		</if>
+		
+		<!-- configure db -->
+		<echo message="Configuring db..." />
+		<mkdir  dir="app/config/${env.name}" />
+		<delete file="app/config/${env.name}/database.php" failonerror="false" />
+		<copy file="build/database.txt" tofile="app/config/${env.name}/database.php" overwrite="true">
+			<filterchain>            
+				<replaceregexp>
+					<regexp pattern="#DB_HOST#" replace="${db.host}" ignoreCase="false" />
+					<regexp pattern="#DB_NAME#" replace="${db.name}" ignoreCase="false" />
+					<regexp pattern="#DB_USER#" replace="${db.user}" ignoreCase="false" />
+					<regexp pattern="#DB_PASS#" replace="${db.pass}" ignoreCase="false" />
+				</replaceregexp>
+			</filterchain>
+		</copy>
+		<echo message="Done." />
+		
+		<echo message="Writing environment..." />
+		<copy file="bootstrap/start.php" tofile="bootstrap/start-tmp.php" overwrite="true">
+			<filterchain>
+				<replaceregexp>
+					<regexp pattern="detectEnvironment\(array\("  replace="detectEnvironment(
+						array('${env.name}' => array('${env.host}')," />
+				</replaceregexp>
+			</filterchain>
+		</copy>
+		<delete file="bootstrap/start.php" failonerror="false" />
+		<copy file="bootstrap/start-tmp.php" tofile="bootstrap/start.php" overwrite="true" />
+		<echo message="Done." />
+		
+		<!-- amend .gitignore -->
+		<append destFile=".gitignore" text="${line.separator}app/config/${env.name}" />
+		
+		<!-- composer -->
+		<echo message="Checking packages..." />
+		<exec 
+			command="composer update" 
+			passthru="true" 
+		/>
+		<echo message="Done." />
+		
+		<!-- migrations -->
+		<echo message="Running db migrations..." />
+		<exec 
+			command="php artisan migrate --env-${env}" 
+			passthru="true" 
+		/>
+		<echo message="Done." />
+
+	</target>	
+	
+	
+</project>
