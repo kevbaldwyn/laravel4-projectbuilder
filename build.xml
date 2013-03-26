@@ -106,6 +106,7 @@
 		<echo message="Done." />
 		
 		<echo message="Writing environment..." />
+		<delete file="bootstrap/start-tmp.php" failonerror="false" />
 		<copy file="bootstrap/start.php" tofile="bootstrap/start-tmp.php" overwrite="true">
 			<filterchain>
 				<replaceregexp>
