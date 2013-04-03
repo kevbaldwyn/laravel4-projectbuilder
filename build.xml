@@ -4,9 +4,12 @@
 	<property name="reserved.env.name" value="testing" />
 	
 	<target name="welcome">
-		<echo message="Hello, welcome to ${phing.project.name}!" />
-		
+		<echo message="==================================================" />
+		<echo message="Hello, welcome to ${phing.project.name} build script!" />
 		<echo message="There are 2 options 'install' and 'update'" />
+		<echo message="run 'phing install' when installing a new copy" />
+		<echo message="run 'phing update' when updating an existing copy" />
+		<echo message="==================================================" />
 	</target>
 	
 	
