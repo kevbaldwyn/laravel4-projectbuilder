@@ -37,7 +37,7 @@
 		<!-- migrations -->
 		<echo message="Running migrations..." />
 		<exec 
-			command="php artisan migrate --env-${env}" 
+			command="php artisan migrate --env=${env.name}" 
 			passthru="true" 
 		/>
 		<echo message="Done." />
@@ -134,7 +134,7 @@
 		<!-- migrations -->
 		<echo message="Running db migrations..." />
 		<exec 
-			command="php artisan migrate --seed --env=${env}" 
+			command="php artisan migrate --seed --env=${env.name}" 
 			passthru="true" 
 		/>
 		<echo message="Done." />
