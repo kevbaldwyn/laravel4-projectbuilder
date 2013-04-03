@@ -11,23 +11,44 @@
 	
 	
 	<target name="update">
+		
+		<echo message="==================================================" />
+		<echo message="Update laravel and run any database migrations." />
+		<echo message="You must also have composer and git installed." />
+		<echo message="Hit enter to accept defaults." />
+		<echo message="Make sure you have updated your local app first." level="warning" />
+		<echo message="==================================================" />
 	
 		<propertyprompt
-    		propertyName="env"
+    		propertyName="env.name"
     		promptText="What is your Laravel environment name?"
+    		defaultValue="local"
 		/>
 	
 		<if>
-			<isfalse value="${env}"/>
+			<isfalse value="${env.name}"/>
 			<then>
 				<fail message="Invalid environment name!" />
 			</then>
+			<elseif>
+				<equals arg1="${env.name}" arg2="${reserved.env.name}" />
+				<then>
+					<fail message="Environment name cannot be '${reserved.env.name}'" />
+				</then>
+			</elseif>
 		</if>
 		
-		<!-- git -->
-		<echo message="Pulling from repository..." />
+		<if>
+			<available file='app/config/${env.name}' type='dir' />
+			<then>
+				<!-- do nothing -->
+				<echo message="Environment found.." />
+			</then>
+			<else>
+				<fail message="Environment 'app/config/${env.name}' doesn't exist." />
+			</else>
+		</if>
 		
-		<echo message="Done." />
 		<!-- composer -->
 		<echo message="Checking packages..." />
 		<exec 
@@ -167,8 +188,7 @@
 		<copy file="bootstrap/start.php" tofile="bootstrap/start-tmp.php" overwrite="true">
 			<filterchain>
 				<replaceregexp>
-					<regexp pattern="detectEnvironment\(array\("  replace="detectEnvironment(array(${line.separator}
-					'${env.name}' => array('${env.host}')," />
+					<regexp pattern="detectEnvironment\(array\("  replace="detectEnvironment(array(${line.separator}${line.separator}	'${env.name}' => array('${env.host}')," />
 				</replaceregexp>
 			</filterchain>
 		</copy>
