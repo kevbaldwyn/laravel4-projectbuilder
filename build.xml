@@ -58,7 +58,7 @@
 		
 		<propertyprompt
     		propertyName="env.name"
-    		promptText="What is your Laravel environment name - do not use '${reserved.env.name}'"
+    		promptText="What is your Laravel environment name. This will create the directory 'app/config/[your-environment-name]' - do not use '${reserved.env.name}'"
     		defaultValue="local"
 		/>
 	
@@ -71,6 +71,12 @@
 				<equals arg1="${env.name}" arg2="${reserved.env.name}" />
 				<then>
 					<fail message="Environment name cannot be '${reserved.env.name}'" />
+				</then>
+			</elseif>
+			<elseif>
+				<available file='app/config/${env.name}' type='dir' />
+				<then>
+					<fail message="The environment 'app/config/${env.name}' already exists." />
 				</then>
 			</elseif>
 		</if>
@@ -151,7 +157,7 @@
 		<copy file="bootstrap/start.php" tofile="bootstrap/start-tmp.php" overwrite="true">
 			<filterchain>
 				<replaceregexp>
-					<regexp pattern="detectEnvironment\(array\("  replace="detectEnvironment(array(
+					<regexp pattern="detectEnvironment\(array\("  replace="detectEnvironment(array(${line.separator}
 					'${env.name}' => array('${env.host}')," />
 				</replaceregexp>
 			</filterchain>
