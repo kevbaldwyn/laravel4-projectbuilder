@@ -139,7 +139,12 @@
 		<!-- configure db -->
 		<echo message="Configuring db..." />
 		<mkdir  dir="app/config/${env.name}" />
-		<delete file="app/config/${env.name}/database.php" failonerror="false" />
+		<if>
+			<available file='app/config/${env.name}/database.php' type='file' />
+			<then>
+				<delete file="app/config/${env.name}/database.php" failonerror="false" />
+			</then>
+		</if>
 		<copy file="build/database.txt" tofile="app/config/${env.name}/database.php" overwrite="true">
 			<filterchain>            
 				<replaceregexp>
@@ -153,7 +158,12 @@
 		<echo message="Done." />
 		
 		<echo message="Writing environment..." />
-		<delete file="bootstrap/start-tmp.php" failonerror="false" />
+		<if>
+			<available file='bootstrap/start-tmp.php' type='file' />
+			<then>
+				<delete file="bootstrap/start-tmp.php" failonerror="false" />
+			</then>
+		</if>
 		<copy file="bootstrap/start.php" tofile="bootstrap/start-tmp.php" overwrite="true">
 			<filterchain>
 				<replaceregexp>
