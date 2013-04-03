@@ -19,7 +19,7 @@
 		<echo message="Update laravel and run any database migrations." />
 		<echo message="You must also have composer and git installed." />
 		<echo message="Hit enter to accept defaults." />
-		<echo message="Make sure you have updated your local app first." level="warning" />
+		<echo message="Please make sure your local app is up to date first." level="warning" />
 		<echo message="==================================================" />
 	
 		<propertyprompt
