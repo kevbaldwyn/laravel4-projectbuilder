@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="Laravel Project" default="welcome" basedir="../" description="Laravel Project Build Targets">
 	
+	<property name="reserved.env.name" value="testing" />
+	
 	<target name="welcome">
 		<echo message="Hello, welcome to ${phing.project.name}!" />
 		
@@ -47,32 +49,17 @@
 	
 	<target name="install">
 		
-		<echo message="Before installing you must have created a database, and have the connection details ready. You must also have composer installed." />
+		<echo message="==================================================" />
+		<echo message="Before installing you must have created a database," />
+		<echo message="and have the connection details ready." />
+		<echo message="You must also have composer and git installed." />
+		<echo message="Hit enter to accept defaults." />
+		<echo message="==================================================" />
 		
 		<propertyprompt
     		propertyName="env.name"
-    		promptText="What is your Laravel environment name?"
-		/>
-		<propertyprompt
-    		propertyName="env.host"
-    		promptText="And the host name you want to use?"
-		/>
-		<echo message="Database settings..." />
-		<propertyprompt
-    		propertyName="db.host"
-    		promptText="Host:"
-		/>
-		<propertyprompt
-    		propertyName="db.name"
-    		promptText="Database name:"
-		/>
-		<propertyprompt
-    		propertyName="db.user"
-    		promptText="Username:"
-		/>
-		<propertyprompt
-    		propertyName="db.pass"
-    		promptText="Password:"
+    		promptText="What is your Laravel environment name - do not use '${reserved.env.name}'"
+    		defaultValue="local"
 		/>
 	
 		<if>
@@ -80,14 +67,55 @@
 			<then>
 				<fail message="Invalid environment name!" />
 			</then>
+			<elseif>
+				<equals arg1="${env.name}" arg2="${reserved.env.name}" />
+				<then>
+					<fail message="Environment name cannot be '${reserved.env.name}'" />
+				</then>
+			</elseif>
 		</if>
+		
+		<propertyprompt
+    		propertyName="env.host"
+    		promptText="The environment host name of the site, ie 'dev.mylocalserver.local', 'localhost', or 'www.example.com'"
+		/>
 	
 		<if>
 			<isfalse value="${env.host}"/>
 			<then>
-				<fail message="Invalid host name!" />
+				<fail message="Invalid environment host name!" />
 			</then>
 		</if>
+		
+		<echo message="Database settings..." />
+		<propertyprompt
+    		propertyName="db.host"
+    		promptText="Database Host"
+    		defaultValue="localhost"
+		/>
+		<propertyprompt
+    		propertyName="db.name"
+    		promptText="Database name"
+		/>
+	
+		<if>
+			<isfalse value="${db.name}"/>
+			<then>
+				<fail message="Invalid database name!" />
+			</then>
+		</if>
+		
+		<propertyprompt
+    		propertyName="db.user"
+    		promptText="Database username"
+    		defaultValue="root"
+		/>
+		<propertyprompt
+    		propertyName="db.pass"
+    		promptText="Database password"
+		/>
+		
+		<fail message="ok" />
 		
 		<!-- configure db -->
 		<echo message="Configuring db..." />
@@ -119,6 +147,7 @@
 		<copy file="bootstrap/start-tmp.php" tofile="bootstrap/start.php" overwrite="true" />
 		<delete file="bootstrap/start-tmp.php" failonerror="false" />
 		<echo message="Done." />
+				
 		
 		<!-- amend .gitignore -->
 		<append destFile=".gitignore" text="${line.separator}app/config/${env.name}" />
@@ -138,7 +167,7 @@
 			passthru="true" 
 		/>
 		<echo message="Done." />
-
+		
 	</target>	
 	
 	
