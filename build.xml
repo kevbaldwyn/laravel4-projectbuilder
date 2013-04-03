@@ -114,9 +114,7 @@
     		propertyName="db.pass"
     		promptText="Database password"
 		/>
-		
-		<fail message="ok" />
-		
+				
 		<!-- configure db -->
 		<echo message="Configuring db..." />
 		<mkdir  dir="app/config/${env.name}" />
