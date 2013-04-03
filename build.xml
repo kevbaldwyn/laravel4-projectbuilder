@@ -114,6 +114,21 @@
     		propertyName="db.pass"
     		promptText="Database password"
 		/>
+		<propertyprompt
+    		propertyName="db.seedit"
+    		promptText="Would you like to seed the database if available, (y/n)"
+    		defaultValue="y"
+		/>
+	
+		<if>
+			<equals arg1="${db.seedit}" arg2="y" />
+			<then>
+				<property name="db.seedflag" value="--seed " />
+			</then>
+			<else>
+				<property name="db.seedflag" value="" />
+			</else>
+		</if>
 				
 		<!-- configure db -->
 		<echo message="Configuring db..." />
@@ -136,8 +151,8 @@
 		<copy file="bootstrap/start.php" tofile="bootstrap/start-tmp.php" overwrite="true">
 			<filterchain>
 				<replaceregexp>
-					<regexp pattern="detectEnvironment\(array\("  replace="detectEnvironment(
-						array('${env.name}' => array('${env.host}')," />
+					<regexp pattern="detectEnvironment\(array\("  replace="detectEnvironment(array(
+					'${env.name}' => array('${env.host}')," />
 				</replaceregexp>
 			</filterchain>
 		</copy>
@@ -161,7 +176,7 @@
 		<!-- migrations -->
 		<echo message="Running db migrations..." />
 		<exec 
-			command="php artisan migrate --seed --env=${env.name}" 
+			command="php artisan migrate ${db.seedflag}--env=${env.name}" 
 			passthru="true" 
 		/>
 		<echo message="Done." />
