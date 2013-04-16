@@ -179,6 +179,19 @@
 				</replaceregexp>
 			</filterchain>
 		</copy>
+		<if>
+			<available file='app/config/${env.name}/app.php' type='file' />
+			<then>
+				<delete file="app/config/${env.name}/app.php" failonerror="false" />
+			</then>
+		</if>
+		<copy file="build/app.txt" tofile="app/config/${env.name}/app.php" overwrite="true">
+			<filterchain>            
+				<replaceregexp>
+					<regexp pattern="#HOST#" replace="${env.host}" ignoreCase="false" />
+				</replaceregexp>
+			</filterchain>
+		</copy>
 		<echo message="Done." />
 		
 		<echo message="Writing environment..." />
