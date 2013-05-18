@@ -66,6 +66,10 @@
 			command="php artisan migrate --env=${env.name}" 
 			passthru="true" 
 		/>
+		<exec 
+			command="php artisan kevbaldwyn:migrate-packages --env=${env.name}" 
+			passthru="true" 
+		/>
 		<echo message="Done." />
 
 	</target>	
@@ -229,6 +233,10 @@
 		<echo message="Running db migrations..." />
 		<exec 
 			command="php artisan migrate ${db.seedflag}--env=${env.name}" 
+			passthru="true" 
+		/>
+		<exec 
+			command="php artisan kevbaldwyn:migrate-packages --env=${env.name}" 
 			passthru="true" 
 		/>
 		<echo message="Done." />
