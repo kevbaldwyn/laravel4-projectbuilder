@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="Laravel Project" default="welcome" basedir="../" description="Laravel Project Build Targets">
 	
-	<property name="reserved.env.name" value="testing" />
+	<property name="reserved.env_name" value="testing" />
 	
+	<property name="env_name" value="" />
+
 	<target name="welcome">
 		<echo message="==================================================" />
 		<echo message="Hello, welcome to ${phing.project.name} build script!" />
@@ -21,34 +23,39 @@
 		<echo message="Hit enter to accept defaults." />
 		<echo message="Please make sure your local app is up to date first." level="warning" />
 		<echo message="==================================================" />
-	
-		<propertyprompt
-    		propertyName="env.name"
-    		promptText="What is your Laravel environment name?"
-    		defaultValue="local"
-		/>
+		
+		<if>
+			<isfalse value="${env_name}"/>
+			<then>
+				<propertyprompt
+		    		propertyName="env_name"
+		    		promptText="What is your Laravel environment name?"
+		    		defaultValue="local"
+				/>
+			</then>
+		</if>
 	
 		<if>
-			<isfalse value="${env.name}"/>
+			<isfalse value="${env_name}"/>
 			<then>
 				<fail message="Invalid environment name!" />
 			</then>
 			<elseif>
-				<equals arg1="${env.name}" arg2="${reserved.env.name}" />
+				<equals arg1="${env_name}" arg2="${reserved.env_name}" />
 				<then>
-					<fail message="Environment name cannot be '${reserved.env.name}'" />
+					<fail message="Environment name cannot be '${reserved.env_name}'" />
 				</then>
 			</elseif>
 		</if>
 		
 		<if>
-			<available file='app/config/${env.name}' type='dir' />
+			<available file='app/config/${env_name}' type='dir' />
 			<then>
 				<!-- do nothing -->
 				<echo message="Environment found.." />
 			</then>
 			<else>
-				<fail message="Environment 'app/config/${env.name}' doesn't exist." />
+				<fail message="Environment 'app/config/${env_name}' doesn't exist." />
 			</else>
 		</if>
 		
@@ -63,11 +70,11 @@
 		<!-- migrations -->
 		<echo message="Running migrations..." />
 		<exec 
-			command="php artisan migrate --env=${env.name}" 
+			command="php artisan migrate --env=${env_name}" 
 			passthru="true" 
 		/>
 		<exec 
-			command="php artisan kevbaldwyn:migrate-packages --env=${env.name}" 
+			command="php artisan kevbaldwyn:migrate-packages --env=${env_name}" 
 			passthru="true" 
 		/>
 		<echo message="Done." />
@@ -85,37 +92,37 @@
 		<echo message="==================================================" />
 		
 		<propertyprompt
-    		propertyName="env.name"
-    		promptText="What is your Laravel environment name. This will create the directory 'app/config/[your-environment-name]' - do not use '${reserved.env.name}'"
+    		propertyName="env_name"
+    		promptText="What is your Laravel environment name. This will create the directory 'app/config/[your-environment-name]' - do not use '${reserved.env_name}'"
     		defaultValue="local"
 		/>
 	
 		<if>
-			<isfalse value="${env.name}"/>
+			<isfalse value="${env_name}"/>
 			<then>
 				<fail message="Invalid environment name!" />
 			</then>
 			<elseif>
-				<equals arg1="${env.name}" arg2="${reserved.env.name}" />
+				<equals arg1="${env_name}" arg2="${reserved.env_name}" />
 				<then>
-					<fail message="Environment name cannot be '${reserved.env.name}'" />
+					<fail message="Environment name cannot be '${reserved.env_name}'" />
 				</then>
 			</elseif>
 			<elseif>
-				<available file='app/config/${env.name}' type='dir' />
+				<available file='app/config/${env_name}' type='dir' />
 				<then>
-					<fail message="The environment 'app/config/${env.name}' already exists." />
+					<fail message="The environment 'app/config/${env_name}' already exists." />
 				</then>
 			</elseif>
 		</if>
 		
 		<propertyprompt
-    		propertyName="env.host"
+    		propertyName="env_host"
     		promptText="The environment host name of the site, ie 'dev.mylocalserver.local', 'localhost', or 'www.example.com'"
 		/>
 	
 		<if>
-			<isfalse value="${env.host}"/>
+			<isfalse value="${env_host}"/>
 			<then>
 				<fail message="Invalid environment host name!" />
 			</then>
@@ -166,14 +173,14 @@
 				
 		<!-- configure db -->
 		<echo message="Configuring db..." />
-		<mkdir  dir="app/config/${env.name}" />
+		<mkdir  dir="app/config/${env_name}" />
 		<if>
-			<available file='app/config/${env.name}/database.php' type='file' />
+			<available file='app/config/${env_name}/database.php' type='file' />
 			<then>
-				<delete file="app/config/${env.name}/database.php" failonerror="false" />
+				<delete file="app/config/${env_name}/database.php" failonerror="false" />
 			</then>
 		</if>
-		<copy file="build/database.txt" tofile="app/config/${env.name}/database.php" overwrite="true">
+		<copy file="build/database.txt" tofile="app/config/${env_name}/database.php" overwrite="true">
 			<filterchain>            
 				<replaceregexp>
 					<regexp pattern="#DB_HOST#" replace="${db.host}" ignoreCase="false" />
@@ -184,15 +191,15 @@
 			</filterchain>
 		</copy>
 		<if>
-			<available file='app/config/${env.name}/app.php' type='file' />
+			<available file='app/config/${env_name}/app.php' type='file' />
 			<then>
-				<delete file="app/config/${env.name}/app.php" failonerror="false" />
+				<delete file="app/config/${env_name}/app.php" failonerror="false" />
 			</then>
 		</if>
-		<copy file="build/app.txt" tofile="app/config/${env.name}/app.php" overwrite="true">
+		<copy file="build/app.txt" tofile="app/config/${env_name}/app.php" overwrite="true">
 			<filterchain>            
 				<replaceregexp>
-					<regexp pattern="#HOST#" replace="${env.host}" ignoreCase="false" />
+					<regexp pattern="#HOST#" replace="${env_host}" ignoreCase="false" />
 				</replaceregexp>
 			</filterchain>
 		</copy>
@@ -208,7 +215,7 @@
 		<copy file="bootstrap/start.php" tofile="bootstrap/start-tmp.php" overwrite="true">
 			<filterchain>
 				<replaceregexp>
-					<regexp pattern="detectEnvironment\(array\("  replace="detectEnvironment(array(${line.separator}${line.separator}	'${env.name}' => array('${env.host}')," />
+					<regexp pattern="detectEnvironment\(array\("  replace="detectEnvironment(array(${line.separator}${line.separator}	'${env_name}' => array('${env_host}')," />
 				</replaceregexp>
 			</filterchain>
 		</copy>
@@ -219,7 +226,7 @@
 				
 		
 		<!-- amend .gitignore -->
-		<append destFile=".gitignore" text="${line.separator}app/config/${env.name}" />
+		<append destFile=".gitignore" text="${line.separator}app/config/${env_name}" />
 		
 		<!-- composer -->
 		<echo message="Checking packages..." />
@@ -232,11 +239,11 @@
 		<!-- migrations -->
 		<echo message="Running db migrations..." />
 		<exec 
-			command="php artisan migrate ${db.seedflag}--env=${env.name}" 
+			command="php artisan migrate ${db.seedflag}--env=${env_name}" 
 			passthru="true" 
 		/>
 		<exec 
-			command="php artisan kevbaldwyn:migrate-packages --env=${env.name}" 
+			command="php artisan kevbaldwyn:migrate-packages --env=${env_name}" 
 			passthru="true" 
 		/>
 		<echo message="Done." />
