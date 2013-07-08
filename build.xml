@@ -231,7 +231,7 @@
 		<!-- composer -->
 		<echo message="Checking packages..." />
 		<exec 
-			command="composer update" 
+			command="composer install" 
 			passthru="true" 
 		/>
 		<echo message="Done." />
